@@ -1,66 +1,83 @@
-const quoteContainer = document.getElementById('quote-container');
-const quoteText = document.getElementById('quote');
-const authorText = document.getElementById('author');
-const twitterBtn = document.getElementById('twitter');
-const newQuoteBtn = document.getElementById('new-quote');
-const loader = document.getElementById('loader');
+const calculatorDisplay = document.querySelector('h1');
+const inputBtns = document.querySelectorAll('button');
+const clearBtn = document.getElementById('clear-btn');
 
-let apiQuotes = [];
+// Calculate first and second values depending on operator
+const calculate = {
+    '/': (firstNumber, secondNumber) => firstNumber / secondNumber,
 
-function showLoadingSpinner() {
-    loader.hidden = false;
-    quoteContainer.hidden = true;
-}
+    '*': (firstNumber, secondNumber) => firstNumber * secondNumber,
 
-function removeLoadingSpinner() {
-    quoteContainer.hidden = false;
-    loader.hidden = true;
-}
+    '+': (firstNumber, secondNumber) => firstNumber + secondNumber,
 
-// Show New Quote
-function newQuote() {
-    showLoadingSpinner();
-    // Pick a random quote from apiQuotes array
-    const quote = apiQuotes[Math.floor(Math.random() * apiQuotes.length)];
-    // Check if Author field is bland and replace it with 'Unknown'
-    if (!quote.author) {
-        authorText.textContent = 'Unknown';
+    '-': (firstNumber, secondNumber) => firstNumber - secondNumber,
+
+    '=': (firstNumber, secondNumber) => secondNumber,
+};
+
+let firstValue = 0;
+let operatorValue = '';
+let awaitingNextValue = false;
+
+function sendNumberValue(number) {
+    // Replace current display value if first value is entered
+    if (awaitingNextValue) {
+        calculatorDisplay.textContent = number;
+        awaitingNextValue = false;
     } else {
-        authorText.textContent = quote.author;
+        // If current display value is 0, replace it, if not add number
+        const displayValue = calculatorDisplay.textContent;
+        calculatorDisplay.textContent = displayValue === '0' ? number : displayValue + number;
     }
-    // Check Quote length to determine styling
-    if (quote.text.length > 120) {
-        quoteText.classList.add('long-quote');
+}
+
+function addDecimal () {
+    // If operator pressed, don't add decimal
+    if (awaitingNextValue) return;
+    // If no decimal, add one
+    if (!calculatorDisplay.textContent.includes('.')) {
+        calculatorDisplay.textContent = `${calculatorDisplay.textContent}.`;
+    }
+}
+
+function useOperator(operator) {
+    const currentValue = Number(calculatorDisplay.textContent);
+    // Prevent multiple operators
+    if (operatorValue && awaitingNextValue) {
+        operatorValue = operator;
+        return;
+    }
+    // Assign firstValue if no value
+    if (!firstValue) {
+        firstValue = currentValue;
     } else {
-        quoteText.classList.remove('long-quote');
+        const calculation = calculate[operatorValue](firstValue, currentValue);
+        calculatorDisplay.textContent = calculation;
+        firstValue = calculation;
     }
-    // Set Quote, Hide Loader
-    quoteText.textContent= quote.text;
-    removeLoadingSpinner();
+    // Ready for next value, store operator
+    awaitingNextValue = true;
+    operatorValue = operator;
 }
 
-// Get Quotes From API
-async function getQuotes () {
-    showLoadingSpinner();
-    const apiUrl = 'https://jacintodesign.github.io/quotes-api/data/quotes.json';
-    try {
-        const response = await fetch(apiUrl);
-        apiQuotes = await response.json();
-        newQuote();
-    } catch (error) {
-        // Catch Error Here
+// Reset all values, display
+function resetAll() {
+    firstValue = 0;
+    operatorValue = '';
+    awaitingNextValue = false;
+    calculatorDisplay.textContent = '0';
+}
+
+// Add Event Listeners for numbers, operators, decimal buttons
+inputBtns.forEach((inputBtn) => {
+    if (inputBtn.classList.length === 0) {
+        inputBtn.addEventListener('click', () => sendNumberValue(inputBtn.value));
+    } else if (inputBtn.classList.contains('operator')) {
+    inputBtn.addEventListener('click', () => useOperator(inputBtn.value));
+    } else if (inputBtn.classList.contains('decimal')) {
+    inputBtn.addEventListener('click', () => addDecimal());
     }
-}
+});
 
-// Tweet Quote
-function tweetQuote() {
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${quoteText.textContent} - ${authorText.textContent}`;
-    window.open(twitterUrl, '_blank');
-}
-
-// Event Listeners
-newQuoteBtn.addEventListener('click', newQuote);
-twitterBtn.addEventListener('click', tweetQuote);
-
-// On Load
-getQuotes();
+// Event Listener
+clearBtn.addEventListener('click', resetAll);
