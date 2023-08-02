@@ -1,38 +1,60 @@
-# quote-generator
+# Simple Javascript Calculator
 
-This is a simple web application that generates random quotes from a JSON file obtained from an external API. The quotes are displayed on the webpage, and users have the option to tweet the quote as well.
+## Overview
 
-The application was built with HTML, CSS, and JavaScript. It also uses the Fetch API to retrieve data from the external API.
-
-## Features
-
-- Generate a random quote from an external API
-- Display the quote and author on the webpage
-- Style the quote differently based on its length
-- Allow users to tweet the quote
+This is a simple calculator app built with Javascript, HTML, and CSS. It allows the user to perform basic arithmetic operations like addition, subtraction, multiplication, and division.
 
 ## How to Use
 
-To use the Random Quote Generator, follow these steps:
+- The calculator display starts at 0
+- Click the number buttons to enter digits into the calculator display 
+- Click an operator button (/, *, +, -) to choose an operator 
+- Click the "=" button to get the result of the calculation
+- Click the "C" button to clear the display and start new calculation
+- Click the "." button to add a decimal point to the number
 
-1. Clone or download the repository
-2. Open the `index.html` file in a web browser
-3. Click the "New Quote" button to generate a new quote
-4. Click the "Tweet" button to tweet the current quote
+## Features
+
+- Perform basic arithmetic operations
+- Clear display with "C" button
+- Chain together successive operations
+- Handles decimals
 
 ## Code Overview
 
-Here are the main components of the code:
+The core logic is handled in Javascript. 
 
-- `quoteContainer`: The HTML element that displays the quote and author
-- `apiQuotes`: An array that stores the quotes retrieved from the external API
-- `loading()`: A function that shows a loading spinner while the data is being fetched
-- `complete()`: A function that hides the loading spinner once the data has been fetched
-- `newQuote()`: A function that generates a new quote by selecting a random quote from `apiQuotes`
-- `getQuotes()`: An asynchronous function that retrieves the quotes from the external API
-- `tweetQuote()`: A function that opens Twitter and populates the tweet with the current quote and author
-- `newQuoteBtn` and `twitterBtn`: The buttons that trigger `newQuote()` and `tweetQuote()` when clicked
+### index.html
 
-## Credits
+- Contains button elements for each digit, operator, and actions like clear
+- Calculator display is a `<h1>` element
+- Buttons have either a number class, operator class, or decimal class
 
-The quotes used in this application were obtained from the [Quotes API](https://jacintodesign.github.io/quotes-api/), created by [Jacinto Design](https://github.com/jacintodesign).
+### style.css
+
+- Styles for digit buttons, operator buttons, and display
+
+### calculator.js
+
+- `calculatorDisplay` variable stores a reference to the display element
+- `inputBtns` variable stores a NodeList of all number and operator buttons  
+- `clearBtn` variable stores a reference to the clear button
+- `calculate` object stores the operation functions for each operator
+- `firstValue`, `operatorValue`, `awaitingNextValue` track the state of calculation  
+- `sendNumberValue()` appends digits to the display or updates the display value
+- `addDecimal()` appends a decimal point if needed
+- `useOperator()` stores the first value and operator when pressed
+- `resetAll()` clears all values and the display
+- Event listeners call these functions for click events
+
+## Possible Future Improvements
+
+Some ways this calculator could be expanded on in the future:
+
+- Support keyboard input of numbers and operators
+- Support more complex operations like square root, exponents, etc
+- Add memory features like "MC", "MR", etc
+- Make the display scroll when the number gets very long rather than truncate
+- Improve styling and visual design
+
+Overall, this project demonstrates how to build a simple calculator app in Javascript and handle chained calculation logic.
